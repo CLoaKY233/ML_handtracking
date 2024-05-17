@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import os
 import tkinter as tk
 from tkinter import filedialog
@@ -25,19 +24,13 @@ def start_capture():
         if not ret:
             break
 
-        # Apply the skin color filter
-        filtered_frame = apply_skin_color_filter(frame)
-
-        # Convert the filtered frame to grayscale
-        gray_frame = cv2.cvtColor(filtered_frame, cv2.COLOR_BGR2GRAY)
-
         # Save each frame as an image in the output folder
         frame_count += 1
         frame_filename = os.path.join(output_folder, f"frame_{frame_count}.jpg")
-        cv2.imwrite(frame_filename, gray_frame)
+        cv2.imwrite(frame_filename, frame)
 
-        # Display the grayscale frame
-        cv2.imshow("Grayscale Frame", gray_frame)
+        # Display the captured frame
+        cv2.imshow("Captured Frame", frame)
 
         # Exit the loop if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -47,30 +40,7 @@ def start_capture():
     cap.release()
     cv2.destroyAllWindows()
 
-    message_label.config(text="Recording complete. Grayscale images saved in the selected folder.")
-
-# Function to apply the skin color filter
-def apply_skin_color_filter(frame):
-    # Convert the frame to the HSV color space
-    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    # Define a color range for detecting skin color (you may need to adjust these values)
-    lower_skin = np.array([0, 20, 70])
-    upper_skin = np.array([20, 255, 255])
-
-    # Create a mask to detect the skin color
-    skin_mask = cv2.inRange(hsv_frame, lower_skin, upper_skin)
-
-    # Use the skin mask to make the hand region white in the original frame
-    white_hand = cv2.bitwise_and(frame, frame, mask=skin_mask)
-
-    # Create a darkened background
-    dark_background = np.zeros_like(frame)
-
-    # Combine the white_hand and dark_background to create the final frame
-    final_frame = cv2.add(white_hand, dark_background)
-
-    return final_frame
+    message_label.config(text="Recording complete. Images saved in the selected folder.")
 
 # Function to select the output folder
 def select_output_folder():
